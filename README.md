@@ -112,6 +112,4 @@ La etiqueta `v1` marca esta versión antes de empezar la v2 (moderna).
 
 | Integrante | Aporte principal |
 |---|---|
-| Oscar Leonardo Rugeles Rodríguez | _(completar)_ |
-| _(integrante 2)_ | _(completar)_ |
-| _(integrante 3)_ | _(completar)_ |
+| Oscar Leonardo Rugeles Rodríguez | diseño, implementación, pruebas y documentación. |
