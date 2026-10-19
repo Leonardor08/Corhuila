@@ -1,0 +1,118 @@
+@startuml clases
+title RutaSur v1 — Diagrama de clases (dominio y servicios)
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam classBackgroundColor #ffffff
+skinparam classBorderColor #1f5f5b
+hide empty members
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 60
+
+package "RutaSur.Datos.Entidades" {
+  class Destino {
+    +Id : int
+    +Nombre : string
+    +Municipio : string
+    +Descripcion : string
+  }
+  class Experiencia {
+    +Id : int
+    +Nombre : string
+    +PrecioPorPersona : decimal
+    +DuracionHoras : int
+  }
+  class Salida {
+    +Id : int
+    +Fecha : DateTime
+    +CupoTotal : int
+    +CuposDisponibles : int
+    --
+    CK: 0 <= CuposDisponibles <= CupoTotal
+  }
+  class Reserva {
+    +Id : int
+    +Codigo : string {único}
+    +NombreTitular : string
+    +Documento : string
+    +Correo : string
+    +Personas : int
+    +Total : decimal
+    +Estado : EstadoReserva
+    +FechaCreacionUtc : DateTime
+  }
+  enum EstadoReserva {
+    Confirmada
+    Cancelada
+  }
+}
+
+Destino "1" *-- "1..*" Experiencia
+Experiencia "1" *-- "0..*" Salida
+Salida "1" o-- "0..*" Reserva
+Reserva --> EstadoReserva
+
+package "RutaSur.Datos.Repositorios" {
+  interface ISalidaRepositorio {
+    +IntentarDescontarCuposAsync(salidaId, personas) : Task<bool>
+    +LiberarCuposAsync(salidaId, personas) : Task
+  }
+  interface IReservaRepositorio {
+    +AgregarAsync(reserva) : Task
+    +ObtenerPorCodigoAsync(codigo) : Task<Reserva?>
+    +ListarPorSalidaAsync(salidaId) : Task<List<Reserva>>
+  }
+  interface ICatalogoRepositorio {
+    +ListarDestinosConExperienciasAsync()
+    +ObtenerExperienciaConSalidasAsync(id, desde)
+    +ObtenerSalidaAsync(id) : Task<Salida?>
+    +AgregarSalidaAsync(salida) : Task
+  }
+  interface IUnidadDeTrabajo {
+    +EjecutarEnTransaccionAsync<T>(operacion) : Task<T>
+  }
+}
+
+package "RutaSur.Negocio" {
+  interface IReservaServicio {
+    +CrearReservaAsync(SolicitudReserva) : Task<ReservaDto>
+    +ConsultarAsync(codigo, documento) : Task<ReservaDto>
+    +CancelarAsync(codigo, documento) : Task<ReservaDto>
+  }
+  class ReservaServicio {
+    +MaxPersonasPorReserva = 10
+    -Validar(SolicitudReserva)
+    -GenerarCodigo() : string
+  }
+  class "SolicitudReserva <<record>>" as Sol
+  class "ReservaDto <<record>>" as RDto
+  class ReglaNegocioException
+  class CuposInsuficientesException
+  class NoEncontradoException
+}
+
+package "RutaSur.Web" {
+  class ReservasController {
+    +Crear(salidaId) : IActionResult
+    +Crear(ReservaFormulario) : IActionResult
+    +Consultar(ConsultaFormulario) : IActionResult
+    +Cancelar(codigo, documento) : IActionResult
+  }
+  class ReservaFormulario
+}
+
+IReservaServicio <|.. ReservaServicio
+ReservaServicio --> ISalidaRepositorio
+ReservaServicio --> IReservaRepositorio
+ReservaServicio --> ICatalogoRepositorio
+ReservaServicio --> IUnidadDeTrabajo
+ReservaServicio ..> Sol
+ReservaServicio ..> RDto
+ReservaServicio ..> CuposInsuficientesException : «lanza»
+ReglaNegocioException <|-- CuposInsuficientesException
+ReglaNegocioException <|-- NoEncontradoException
+ReservasController --> IReservaServicio
+ReservasController ..> ReservaFormulario
+ReservaFormulario -[hidden]down- IReservaServicio
+CuposInsuficientesException -[hidden]down- ISalidaRepositorio
+@enduml

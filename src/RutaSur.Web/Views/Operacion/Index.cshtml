@@ -1,0 +1,44 @@
+@model OperacionViewModel
+@{ ViewData["Title"] = "Operador"; }
+<section class="cabecera">
+    <p class="etiqueta">Panel del operador</p>
+    <h1>Ocupación de salidas</h1>
+</section>
+@if (Model.Mensaje is not null) { <div class="exito">@Model.Mensaje</div> }
+
+<table class="tabla">
+    <thead><tr><th>Fecha</th><th>Experiencia</th><th>Vendidos</th><th>Disponibles</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var s in Model.Salidas)
+    {
+        <tr>
+            <td>@s.Fecha.ToString("ddd d MMM, h:mm tt")</td>
+            <td>@s.Experiencia <span class="tenue">· @s.Destino</span></td>
+            <td>@s.Vendidos / @s.CupoTotal</td>
+            <td>@s.CuposDisponibles</td>
+            <td><a asp-action="Reservas" asp-route-id="@s.SalidaId">Ver reservas</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h2>Programar nueva salida</h2>
+<form asp-action="ProgramarSalida" method="post" class="formulario formulario--fila">
+    <div asp-validation-summary="ModelOnly" class="alerta"></div>
+    <label asp-for="NuevaSalida.ExperienciaId"></label>
+    <select asp-for="NuevaSalida.ExperienciaId">
+        @foreach (var d in Model.Destinos)
+        {
+            <optgroup label="@d.Nombre">
+                @foreach (var e in d.Experiencias) { <option value="@e.Id">@e.Nombre</option> }
+            </optgroup>
+        }
+    </select>
+    <label asp-for="NuevaSalida.Fecha"></label>
+    <input asp-for="NuevaSalida.Fecha" type="datetime-local" />
+    <span asp-validation-for="NuevaSalida.Fecha" class="error"></span>
+    <label asp-for="NuevaSalida.CupoTotal"></label>
+    <input asp-for="NuevaSalida.CupoTotal" type="number" min="1" max="60" />
+    <span asp-validation-for="NuevaSalida.CupoTotal" class="error"></span>
+    <button type="submit" class="boton">Programar</button>
+</form>

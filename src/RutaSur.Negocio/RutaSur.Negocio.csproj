@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- CAPA DE NEGOCIO: reglas (cero sobreventa, validaciones), servicios de aplicación y DTOs.
+       Depende SOLO de la capa de Datos (arquitectura en capas estricta). -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RutaSur.Datos\RutaSur.Datos.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="RutaSur.Tests" />
+  </ItemGroup>
+</Project>

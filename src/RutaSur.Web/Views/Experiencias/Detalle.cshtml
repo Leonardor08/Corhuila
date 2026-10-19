@@ -1,0 +1,35 @@
+@model ExperienciaDetalle
+@{ ViewData["Title"] = Model.Nombre; }
+<a class="volver" asp-controller="Home" asp-action="Index">← Destinos</a>
+<section class="cabecera">
+    <p class="etiqueta">@Model.Destino · @Model.Municipio</p>
+    <h1>@Model.Nombre</h1>
+    <p>@Model.Descripcion</p>
+    <p class="dato"><strong>@Model.PrecioPorPersona.ToString("C0")</strong> por persona · @Model.DuracionHoras horas</p>
+</section>
+
+<h2>Próximas salidas</h2>
+@if (Model.Salidas.Count == 0)
+{
+    <p class="tenue">No hay salidas programadas.</p>
+}
+else
+{
+<table class="tabla">
+    <thead><tr><th>Fecha</th><th>Cupos</th><th>Ocupación</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var s in Model.Salidas)
+    {
+        <tr>
+            <td>@s.Fecha.ToString("dddd d 'de' MMMM, h:mm tt")</td>
+            <td>@s.CuposDisponibles de @s.CupoTotal</td>
+            <td><div class="medidor"><div style="width:@(s.PorcentajeOcupacion)%"></div></div></td>
+            <td>
+                @if (s.Agotada) { <span class="sello sello--agotado">Agotada</span> }
+                else { <a class="boton boton--chico" asp-controller="Reservas" asp-action="Crear" asp-route-salidaId="@s.Id">Reservar</a> }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+}

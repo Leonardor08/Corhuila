@@ -1,0 +1,24 @@
+@model ReservasSalidaViewModel
+@{ ViewData["Title"] = "Reservas de la salida"; var s = Model.Salida; }
+<a class="volver" asp-action="Index">← Panel del operador</a>
+<section class="cabecera">
+    <p class="etiqueta">@s.Destino</p>
+    <h1>@s.Experiencia</h1>
+    <p class="dato">@s.Fecha.ToString("dddd d 'de' MMMM 'de' yyyy, h:mm tt") · @s.CuposDisponibles cupos disponibles</p>
+</section>
+@if (Model.Reservas.Count == 0) { <p class="tenue">Aún no hay reservas para esta salida.</p> }
+else
+{
+<table class="tabla">
+    <thead><tr><th>Código</th><th>Titular</th><th>Documento</th><th>Personas</th><th>Total</th><th>Estado</th></tr></thead>
+    <tbody>
+    @foreach (var r in Model.Reservas)
+    {
+        <tr class="@(r.Estado == "Cancelada" ? "fila--tachada" : "")">
+            <td><code>@r.Codigo</code></td><td>@r.NombreTitular</td><td>@r.Documento</td>
+            <td>@r.Personas</td><td>@r.Total.ToString("C0")</td><td>@r.Estado</td>
+        </tr>
+    }
+    </tbody>
+</table>
+}

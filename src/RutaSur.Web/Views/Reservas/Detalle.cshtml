@@ -1,0 +1,23 @@
+@model ReservaDto
+@{ ViewData["Title"] = "Reserva " + Model.Codigo; var cancelada = Model.Estado == "Cancelada"; }
+@if (ViewData["Mensaje"] is string m) { <div class="exito">@m</div> }
+<section class="comprobante @(cancelada ? "comprobante--cancelado" : "")">
+    <p class="etiqueta">Reserva @(cancelada ? "cancelada" : "confirmada")</p>
+    <h1 class="codigo">@Model.Codigo</h1>
+    <dl>
+        <dt>Experiencia</dt><dd>@Model.Experiencia — @Model.Destino</dd>
+        <dt>Salida</dt><dd>@Model.FechaSalida.ToString("dddd d 'de' MMMM 'de' yyyy, h:mm tt")</dd>
+        <dt>Titular</dt><dd>@Model.NombreTitular (doc. @Model.Documento)</dd>
+        <dt>Personas</dt><dd>@Model.Personas</dd>
+        <dt>Total</dt><dd>@Model.Total.ToString("C0")</dd>
+    </dl>
+    <p class="tenue">Guarde el código: con él y su documento puede consultar o cancelar la reserva.</p>
+    @if (!cancelada)
+    {
+        <form asp-action="Cancelar" method="post">
+            <input type="hidden" name="codigo" value="@Model.Codigo" />
+            <input type="hidden" name="documento" value="@Model.Documento" />
+            <button type="submit" class="boton boton--secundario">Cancelar reserva</button>
+        </form>
+    }
+</section>

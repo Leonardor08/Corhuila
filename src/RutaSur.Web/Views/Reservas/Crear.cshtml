@@ -1,0 +1,45 @@
+@model ReservarViewModel
+@{ ViewData["Title"] = "Reservar"; var s = Model.Salida; }
+<section class="cabecera">
+    <p class="etiqueta">@s.Destino</p>
+    <h1>@s.Experiencia</h1>
+    <p class="dato">@s.Fecha.ToString("dddd d 'de' MMMM 'de' yyyy, h:mm tt") · <strong>@s.CuposDisponibles cupos disponibles</strong> · @s.PrecioPorPersona.ToString("C0") por persona</p>
+</section>
+
+@if (Model.Error is not null)
+{
+    <div class="alerta">@Model.Error</div>
+}
+
+@if (s.CuposDisponibles == 0)
+{
+    <div class="alerta">Esta salida está agotada.</div>
+}
+else
+{
+<form asp-action="Crear" method="post" class="formulario">
+    <input type="hidden" asp-for="Formulario.SalidaId" />
+    <div asp-validation-summary="ModelOnly" class="alerta"></div>
+    <label asp-for="Formulario.NombreTitular"></label>
+    <input asp-for="Formulario.NombreTitular" />
+    <span asp-validation-for="Formulario.NombreTitular" class="error"></span>
+
+    <label asp-for="Formulario.Documento"></label>
+    <input asp-for="Formulario.Documento" inputmode="numeric" />
+    <span asp-validation-for="Formulario.Documento" class="error"></span>
+
+    <label asp-for="Formulario.Correo"></label>
+    <input asp-for="Formulario.Correo" type="email" />
+    <span asp-validation-for="Formulario.Correo" class="error"></span>
+
+    <label asp-for="Formulario.Personas"></label>
+    <input asp-for="Formulario.Personas" type="number" min="1" max="@Math.Min(10, s.CuposDisponibles)" />
+    <span asp-validation-for="Formulario.Personas" class="error"></span>
+
+    <label class="casilla"><input asp-for="Formulario.AceptaTratamientoDatos" /> <span>Acepto el tratamiento de mis datos personales (Ley 1581 de 2012)</span></label>
+    <span asp-validation-for="Formulario.AceptaTratamientoDatos" class="error"></span>
+
+    <button type="submit" class="boton">Confirmar reserva</button>
+</form>
+}
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

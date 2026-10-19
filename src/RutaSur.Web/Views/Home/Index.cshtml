@@ -1,0 +1,27 @@
+@model IReadOnlyList<DestinoResumen>
+@{ ViewData["Title"] = "Destinos"; }
+<section class="portada">
+    <p class="etiqueta">Sur del Huila</p>
+    <h1>Reserve su cupo en San Agustín, Isnos y la Tatacoa</h1>
+    <p>Salidas con cupo limitado. La confirmación es inmediata y nunca vendemos más cupos de los que hay.</p>
+</section>
+
+<div class="rejilla">
+@foreach (var d in Model)
+{
+    <article class="tarjeta">
+        <p class="etiqueta">@d.Municipio</p>
+        <h2>@d.Nombre</h2>
+        <p class="tenue">@d.Descripcion</p>
+        <ul class="lista-experiencias">
+        @foreach (var e in d.Experiencias)
+        {
+            <li>
+                <a asp-controller="Experiencias" asp-action="Detalle" asp-route-id="@e.Id">@e.Nombre</a>
+                <span>@e.PrecioPorPersona.ToString("C0") · @e.DuracionHoras h</span>
+            </li>
+        }
+        </ul>
+    </article>
+}
+</div>

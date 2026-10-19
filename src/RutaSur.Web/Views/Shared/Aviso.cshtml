@@ -1,0 +1,7 @@
+@model string
+@{ ViewData["Title"] = "Aviso"; }
+<section class="aviso">
+    <h1>No fue posible completar la acción</h1>
+    <p>@Model</p>
+    <a class="boton" asp-controller="Home" asp-action="Index">Volver a los destinos</a>
+</section>

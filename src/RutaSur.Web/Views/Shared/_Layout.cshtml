@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · RutaSur</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="barra">
+        <div class="contenedor barra__fila">
+            <a class="marca" asp-controller="Home" asp-action="Index">Ruta<span>Sur</span></a>
+            <nav class="menu">
+                <a asp-controller="Home" asp-action="Index">Destinos</a>
+                <a asp-controller="Reservas" asp-action="Consultar">Mi reserva</a>
+                <a asp-controller="Operacion" asp-action="Index" class="menu__operador">Operador</a>
+            </nav>
+        </div>
+    </header>
+    <main class="contenedor">
+        @RenderBody()
+    </main>
+    <footer class="pie">
+        <div class="contenedor">RutaSur v1 · Reservas de turismo regional del Huila · MVC sobre arquitectura en capas</div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

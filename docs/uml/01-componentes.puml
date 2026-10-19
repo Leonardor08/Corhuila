@@ -1,0 +1,72 @@
+@startuml componentes
+title RutaSur v1 — Diagrama de componentes (MVC sobre arquitectura en capas)
+skinparam componentStyle uml2
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 70
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam packageBorderColor #8a3b12
+skinparam componentBorderColor #1f5f5b
+skinparam componentBackgroundColor #ffffff
+skinparam packageBackgroundColor #fbf8f4
+
+actor "Turista" as turista
+actor "Operador turístico" as operador
+
+package "Capa de Presentación\n(RutaSur.Web · ASP.NET Core MVC)" {
+  [Controladores\nHome · Experiencias\nReservas · Operacion] as ctrl
+  [Vistas Razor] as vistas
+  [Modelos de vista\n(+ validación)] as vm
+  [ReglaNegocioFiltro] as filtro
+}
+
+package "Capa de Negocio\n(RutaSur.Negocio)" {
+  [CatalogoServicio\n«ICatalogoServicio»] as cat
+  [ReservaServicio\n«IReservaServicio»\nregla: cero sobreventa] as res
+  [OperacionServicio\n«IOperacionServicio»] as op
+  [DTOs] as dtos
+}
+
+package "Capa de Datos\n(RutaSur.Datos · EF Core)" {
+  interface ICatalogoRepositorio
+  interface ISalidaRepositorio
+  interface IReservaRepositorio
+  interface IUnidadDeTrabajo
+  [Repositorios EF Core] as repos
+  [RutaSurDbContext] as ctx
+  [Entidades] as ent
+}
+
+database "SQLite\nrutasur.db" as db
+
+turista --> ctrl : HTTP
+operador --> ctrl : HTTP
+ctrl --> vistas
+ctrl ..> vm
+ctrl --> cat
+ctrl --> res
+ctrl --> op
+cat ..> dtos
+res ..> dtos
+cat --> ICatalogoRepositorio
+res --> ISalidaRepositorio
+res --> IReservaRepositorio
+res --> IUnidadDeTrabajo
+op --> ICatalogoRepositorio
+ICatalogoRepositorio -- repos
+ISalidaRepositorio -- repos
+IReservaRepositorio -- repos
+IUnidadDeTrabajo -- repos
+repos --> ctx
+ctx ..> ent
+ctx --> db : ADO.NET / SQL
+
+vistas -[hidden]down- cat
+dtos -[hidden]down- ICatalogoRepositorio
+note right of op
+  Restricción de capas: cada capa solo usa
+  a la inmediatamente inferior. La Presentación
+  nunca referencia a Datos ni a EF Core.
+end note
+@enduml

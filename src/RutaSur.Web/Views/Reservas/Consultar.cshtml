@@ -1,0 +1,13 @@
+@model ConsultaFormulario
+@{ ViewData["Title"] = "Consultar reserva"; }
+<section class="cabecera"><h1>Consultar mi reserva</h1></section>
+<form asp-action="Consultar" method="post" class="formulario">
+    <div asp-validation-summary="ModelOnly" class="alerta"></div>
+    <label asp-for="Codigo"></label>
+    <input asp-for="Codigo" placeholder="RS-XXXXXX" />
+    <span asp-validation-for="Codigo" class="error"></span>
+    <label asp-for="Documento"></label>
+    <input asp-for="Documento" inputmode="numeric" />
+    <span asp-validation-for="Documento" class="error"></span>
+    <button type="submit" class="boton">Consultar</button>
+</form>

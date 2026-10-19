@@ -1,0 +1,45 @@
+@startuml secuencia
+title RutaSur v1 — Secuencia: crear una reserva sin sobreventa
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam sequenceParticipantBorderColor #1f5f5b
+autonumber
+
+actor Turista
+participant "Navegador\n(Vista Razor)" as V
+participant "ReservasController\n[Presentación]" as C
+participant "ReservaServicio\n[Negocio]" as S
+participant "IUnidadDeTrabajo\n[Datos]" as U
+participant "SalidaRepositorio\n[Datos]" as SR
+participant "ReservaRepositorio\n[Datos]" as RR
+database "SQLite" as DB
+
+Turista -> V : diligencia formulario\n(titular, documento, correo, personas)
+V -> C : POST /Reservas/Crear
+C -> C : validar ModelState (DataAnnotations)
+C -> S : CrearReservaAsync(SolicitudReserva)
+S -> S : Validar(reglas: 1..10 personas,\ndocumento, correo, salida futura)
+S -> U : EjecutarEnTransaccionAsync(...)
+U -> DB : BEGIN IMMEDIATE
+U -> S : ejecuta operación
+S -> SR : IntentarDescontarCuposAsync(salidaId, n)
+SR -> DB : UPDATE Salidas SET CuposDisponibles = CuposDisponibles - n\nWHERE Id = @id AND CuposDisponibles >= n
+DB --> SR : filas afectadas (0 ó 1)
+alt filas = 1 (hay cupo)
+  SR --> S : true
+  S -> RR : AgregarAsync(reserva)
+  RR -> DB : INSERT INTO Reservas ...
+  S --> U : reserva
+  U -> DB : COMMIT
+  S --> C : ReservaDto (código RS-XXXXXX)
+  C --> V : 302 → /Reservas/Confirmacion
+  V --> Turista : comprobante con código
+else filas = 0 (cupo agotado por otra solicitud)
+  SR --> S : false
+  S -> S : throw CuposInsuficientesException
+  U -> DB : ROLLBACK
+  S --> C : CuposInsuficientesException
+  C --> V : formulario con mensaje y cupos actualizados
+  V --> Turista : "No hay cupos suficientes..."
+end
+@enduml
